@@ -4,3 +4,7 @@ env-*
 
 # python notebooks
 **/*.ipynb_checkpoints/
+
+# compilation artifacts
+*.pyc
+**/__pycache__/
