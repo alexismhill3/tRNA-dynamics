@@ -16,8 +16,6 @@ def single_codon(seed, charging_rate, time_limit, output_dir):
 
     plasmid.add_promoter(name="phi1", start=1, stop=10,
                          interactions={"rnapol": 2e7})
-    plasmid.add_promoter(name="phi1", start=1, stop=10,
-                         interactions={"rnapol": 2e7})
     plasmid.add_terminator(name="t1", start=360, stop=361,
                            efficiency={"rnapol": 1.0})
     plasmid.add_gene(name="proteinX", start=31, stop=351,
@@ -28,7 +26,7 @@ def single_codon(seed, charging_rate, time_limit, output_dir):
 
     sim.add_trna(tRNA, charging_rate)
 
-    sim.simulate(time_limit=time_limit, time_step=5, output=f"{output_dir}/single_gene_single_codon_{charging_rate}_{seed}.tsv")
+    sim.simulate(time_limit=time_limit, time_step=5, output=f"{output_dir}/single_gene_single_codon_0.5_{charging_rate}_{seed}.tsv")
 
 
 if __name__ == "__main__":
