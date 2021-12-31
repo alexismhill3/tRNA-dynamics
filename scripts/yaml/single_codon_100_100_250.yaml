@@ -1,0 +1,51 @@
+## Model parameters -----
+
+cell_volume: 8.0e-16
+
+polymerases:
+- copy_number: 10
+  footprint: 10
+  name: "rnapol"
+  speed: 250
+
+ribosomes:
+- copy_number: 100
+  footprint: 15
+  speed: 6
+
+tRNA:
+  codons: {"AAA": {"TTT": {"charged": 100, "uncharged": 0}},}
+  charging_rate: 100
+
+## Genome parameters -----
+
+genome: 
+  name: "plasmid" 
+  length: 361
+#  transcript_degradation_rate_ext: 0.00001
+#  rnase_speed: 20
+#  rnase_footprint: 10
+  copy_number: 1
+
+genes:
+- name: "proteinX"
+  rbs: -15
+  rbs_strength: 1000000
+  start: 31
+  stop: 351
+
+promoters:
+- interactions:
+    rnapol: 20000000
+  name: "phi1"
+  start: 1
+  stop: 10
+
+terminators:
+- interactions:
+    rnapol: 1.0
+  name: "t1"
+  start: 360
+  stop: 361
+
+seq: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
