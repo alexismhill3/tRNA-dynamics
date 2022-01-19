@@ -2,7 +2,7 @@ import pinetree as pt
 import sys
 
 
-def single_codon(seed, charging_rate, time_limit, output_dir, transcripts):
+def single_codon(seed, charging_rate, time_limit, output_dir, transcripts, rbs):
 
     tRNA = {"AAA": {"TTT": {"charged": 100, "uncharged": 0}},}
     seq = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
@@ -17,14 +17,14 @@ def single_codon(seed, charging_rate, time_limit, output_dir, transcripts):
     while i < transcripts:
         transcript = pt.Transcript("transcript", 361)
         transcript.add_gene(name="proteinX", start=31, stop=351,
-                     rbs_start=(31 - 15), rbs_stop=31, rbs_strength=1e6)
+                     rbs_start=(31 - 15), rbs_stop=31, rbs_strength=rbs)
         transcript.add_seq(seq=seq)
         sim.register_transcript(transcript)
         i += 1
 
     sim.add_trna(tRNA, charging_rate)
-    sim.simulate(time_limit=time_limit, time_step=1, output=f"{output_dir}/fixed_transcript_{transcripts}_{charging_rate}_{seed}.tsv")
+    sim.simulate(time_limit=time_limit, time_step=1, output=f"{output_dir}/fixed_transcript_{transcripts}_{charging_rate}_{rbs}_{seed}.tsv")
 
 
 if __name__ == "__main__":
-    single_codon(int(sys.argv[1]), float(sys.argv[2]), int(sys.argv[3]), sys.argv[4], int(sys.argv[5]))
+    single_codon(int(sys.argv[1]), float(sys.argv[2]), int(sys.argv[3]), sys.argv[4], int(sys.argv[5]), float(sys.argv[6]))
