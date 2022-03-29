@@ -8,3 +8,6 @@ env-*
 # compilation artifacts
 *.pyc
 **/__pycache__/
+
+# simulation output is getting too big to host on github
+output/
