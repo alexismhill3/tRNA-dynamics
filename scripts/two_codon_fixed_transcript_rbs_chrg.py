@@ -37,4 +37,4 @@ def two_codon(seed, output_dir, rbs, chrg_rate, conf):
 
 
 if __name__ == "__main__":
-    two_codon(int(sys.argv[1]), sys.argv[2], float(sys.argv[3]), float(sys.argv[4]), sys.argv[4])
+    two_codon(int(sys.argv[1]), sys.argv[2], float(sys.argv[3]), float(sys.argv[4]), sys.argv[5])
