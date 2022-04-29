@@ -2,7 +2,7 @@ import yaml
 import random
 from typing import Dict, Tuple, Optional
 
-class TwoCodonSingleTranscript():
+class TwoCodonSingleTranscriptConf():
 
     def __init__(self, transcript_len: int, codon_comp: Tuple, trna_odds: Dict, seed: Optional[int] = 4, **kwargs):
         self.transcript_len = transcript_len
@@ -17,7 +17,6 @@ class TwoCodonSingleTranscript():
     def _format_transcript(self):
         codons = ["AAA"] * int(self.transcript_len * self.codon1) \
                  + ["TAT"] * int(self.transcript_len * self.codon2)
-        
         random.Random(self.seed).shuffle(codons)
         return "A"*30 + "".join(codons) + "A"*20
 
