@@ -53,7 +53,6 @@ def sim_using_classes(dir):
                                                    time_step=TIME_STEP)
     serializer.serialize(dir)
     config = serializer.filename()
-    #print(config)
 
     simulator = SimulateTwoCodonSingleTranscript(config_file=f"{dir}/{config}",
                                                  seed=SEED)
