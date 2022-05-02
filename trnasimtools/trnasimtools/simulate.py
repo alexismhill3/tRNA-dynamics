@@ -1,9 +1,8 @@
-from distutils.command.config import config
 import yaml
 from typing import Optional, Tuple
 import pinetree as pt
 
-class TwoCodonSingleTranscriptSim():
+class SimulateTwoCodonSingleTranscript():
 
     def __init__(self, 
                 config_file: str, 
@@ -51,8 +50,8 @@ class TwoCodonSingleTranscriptSim():
             i += 1
     
     def _add_trna(self):
-        trna1_proportion = self.simulation_data["trna_odds"]["TTT"] / 100
-        trna2_proportion = self.simulation_data["trna_odds"]["ATA"] / 100
+        trna1_proportion = self.simulation_data["trna_proportion"]["TTT"]
+        trna2_proportion = self.simulation_data["trna_proportion"]["ATA"]
         counts_map = {"TTT": [int(self.total_trna * trna1_proportion), 0], 
                       "ATA": [int(self.total_trna * trna2_proportion), 0]}
         trna_map = {"AAA": ["TTT"], "TAT": ["ATA"]}
