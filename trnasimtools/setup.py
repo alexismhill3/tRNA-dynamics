@@ -1,4 +1,4 @@
 from setuptools import setup, find_packages
 
-setup(name="simulation",
+setup(name="trnasimtools",
       version="0.1")
