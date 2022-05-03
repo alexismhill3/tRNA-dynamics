@@ -62,7 +62,7 @@ def sim_using_classes(dir):
 def test_twocodonsingletranscript():
     """
     Runs two identical simulations, with and without the TwoCodonSingleTranscript
-    wrapper/helper classes, and checks that the output from each is the same. 
+    wrapper/helper classes, and checks that the output from each is the same (it should be). 
     """
     tmpdir = tempfile.mkdtemp()
     output1 = sim_hardcoded(tmpdir)

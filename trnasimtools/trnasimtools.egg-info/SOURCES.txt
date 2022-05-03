@@ -1,5 +1,0 @@
-setup.py
-trnasimtools.egg-info/PKG-INFO
-trnasimtools.egg-info/SOURCES.txt
-trnasimtools.egg-info/dependency_links.txt
-trnasimtools.egg-info/top_level.txt
