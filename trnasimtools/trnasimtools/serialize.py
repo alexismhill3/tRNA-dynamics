@@ -21,8 +21,7 @@ class SerializeTwoCodonSingleTranscript():
         self.params["config_filename"] = self._format_filename()
 
     def _format_transcript(self):
-        codons = ["AAA"] * int(self.transcript_len * self.codon1) \
-                 + ["TAT"] * int(self.transcript_len * self.codon2)
+        codons = ["AAA"] * round(self.transcript_len * self.codon1) + ["TAT"] * round(self.transcript_len * self.codon2)
         random.Random(self.seed).shuffle(codons)
         return "A"*30 + "".join(codons) + "A"*20
 
