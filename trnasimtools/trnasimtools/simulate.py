@@ -1,6 +1,7 @@
 import yaml
 from typing import Optional, Tuple, List
 import pinetree as pt
+from trnasimtools.common import add_transcripts, add_two_trna_species
 
 class SimulateTwoCodonSingleTranscript():
 
@@ -37,28 +38,17 @@ class SimulateTwoCodonSingleTranscript():
         return data
 
     def _add_transcripts(self):
-        ribosome_footprint = self.ribosome_params[1]
-        # convert CDS length to nt and add 50 nt buffer (30 upstream, 20 downstream)
-        transcript_len = self.simulation_data["transcript_len"] * 3 + 50
-        i = 0
-        # pinetree can only add one transcript at a time for some reason, so do this in a loop
-        while i < self.transcript_copy_number:
-            transcript = pt.Transcript("transcript", transcript_len)
-            transcript.add_gene(name="proteinX", start=31, stop=transcript_len - 20,
-                                rbs_start=(31 - ribosome_footprint), rbs_stop=31, 
-                                rbs_strength=self.ribosome_binding_rate)
-            transcript.add_seq(seq=self.simulation_data["transcript_seq"])
-            self.model.register_transcript(transcript)
-            i += 1
+        add_transcripts(self.ribosome_params,
+                        self.simulation_data,
+                        self.transcript_copy_number,
+                        self.ribosome_binding_rate,
+                        self.model)
     
     def _add_trna(self):
-        trna1_proportion = self.simulation_data["trna_proportion"]["TTT"]
-        trna2_proportion = self.simulation_data["trna_proportion"]["ATA"]
-        counts_map = {"TTT": [int(self.total_trna * trna1_proportion), 0], 
-                      "ATA": [int(self.total_trna * trna2_proportion), 0]}
-        trna_map = {"AAA": ["TTT"], "TAT": ["ATA"]}
-        rates_map = {"TTT": self.trna_charging_rates[0], "ATA": self.trna_charging_rates[1]}
-        self.model.add_trna(trna_map, counts_map, rates_map)
+        add_two_trna_species(self.simulation_data,
+                             self.total_trna,
+                             self.trna_charging_rates,
+                             self.model)
     
     def _add_ribosomes(self):
         speed, footprint = self.ribosome_params
