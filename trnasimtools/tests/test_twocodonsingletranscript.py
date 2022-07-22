@@ -86,5 +86,5 @@ def test_transcript_off_by_one_bug():
     serializer.serialize(tmpdir)
     with open(f"{tmpdir}/{serializer.filename()}", "r") as stream:
         config = yaml.safe_load(stream)
-        assert len(config["transcript_seq"]) == 350
+        assert len(config["transcript_data"][0]["transcript_seq"]) == 350
     shutil.rmtree(tmpdir)
