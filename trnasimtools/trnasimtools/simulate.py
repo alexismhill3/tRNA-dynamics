@@ -130,12 +130,12 @@ class SimulateTwoCodonMultiTranscript():
     
     def _format_filename(self):
         base = self.simulation_data["config_filename"].split(".yaml")[0]
-        transcript_str, rbs_str = ""
+        transcript_str, rbs_str = ("", "")
         for (transcript_cn, rbs) in zip(self.transcript_copy_numbers, self.ribosome_binding_rates):
             transcript_str = transcript_str + f"{transcript_cn}_"
             rbs_str = rbs_str + f"{rbs}_"
         return f"{base}_{transcript_str}{self.ribosome_copy_number}_{self.total_trna}_" + \
-               f"{rbs_str}{self.ribosome_binding_rate_two}_{self.trna_charging_rates[0]}_{self.trna_charging_rates[0]}_{self.seed}.tsv"
+               f"{rbs_str}{self.trna_charging_rates[0]}_{self.trna_charging_rates[0]}_{self.seed}.tsv"
     
     def filename(self):
         return self._format_filename()
