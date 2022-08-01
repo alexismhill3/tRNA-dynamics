@@ -38,7 +38,7 @@ def sim_hardcoded_multi_transcript(dir):
     i = 0
     while i < TS_COPY[1]:
         transcript = pt.Transcript("transcript", 350)
-        transcript.add_gene(name="proteinX", start=31, stop=330,
+        transcript.add_gene(name="proteinY", start=31, stop=330,
                      rbs_start=(31 - 15), rbs_stop=31, rbs_strength=RBS_STRENGTH[1])
         transcript.add_seq(seq=seq_6_4)
         sim.register_transcript(transcript)
@@ -55,6 +55,7 @@ def sim_hardcoded_multi_transcript(dir):
 def sim_using_classes_multi_transcript(dir):
     serializer = SerializeTwoCodonMultiTranscript(transcript_lens=[100, 100],
                                                    codon_comps=[(0.1, 0.9), (0.4, 0.6)],
+                                                   transcript_names=["proteinX", "proteinY"],
                                                    trna_proportion=TRNA_PROPORTIONS,
                                                    transcript_copy_numbers=TS_COPY,
                                                    ribosome_binding_rates=RBS_STRENGTH,

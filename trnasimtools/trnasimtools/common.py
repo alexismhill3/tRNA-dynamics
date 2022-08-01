@@ -4,7 +4,8 @@ def add_transcripts(ribosome_params,
                     transcript_data,
                     transcript_copy_number,
                     ribosome_binding_rate,
-                    model):
+                    model, 
+                    name = "proteinX"):
     ribosome_footprint = ribosome_params[1]
     # convert CDS length to nt and add 50 nt buffer (30 upstream, 20 downstream)
     transcript_len = transcript_data["transcript_len"] * 3 + 50
@@ -12,7 +13,7 @@ def add_transcripts(ribosome_params,
     # pinetree can only add one transcript at a time for some reason, so do this in a loop
     while i < transcript_copy_number:
         transcript = pt.Transcript("transcript", transcript_len)
-        transcript.add_gene(name="proteinX", start=31, stop=transcript_len - 20,
+        transcript.add_gene(name=transcript_data["transcript_name"], start=31, stop=transcript_len - 20,
                             rbs_start=(31 - ribosome_footprint), rbs_stop=31, 
                             rbs_strength=ribosome_binding_rate)
         transcript.add_seq(seq=transcript_data["transcript_seq"])

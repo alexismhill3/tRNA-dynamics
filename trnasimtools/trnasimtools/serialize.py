@@ -20,6 +20,7 @@ class SerializeTwoCodonSingleTranscript():
         self.params["config_filename"] = self._format_filename()
         self.params["transcript_data"][0]["transcript_seq"] = self._format_transcript()
         self.params["transcript_data"][0]["transcript_len"] = transcript_len
+        self.params["transcript_data"][0]["transcript_name"] = "proteinX"
 
     def _format_transcript(self):
         codons = ["AAA"] * round(self.transcript_len * self.codon1) + ["TAT"] * round(self.transcript_len * self.codon2)
@@ -42,6 +43,7 @@ class SerializeTwoCodonMultiTranscript():
 
     def __init__(self, 
                  transcript_lens: List, 
+                 transcript_names: List,
                  codon_comps: List, 
                  trna_proportion: Tuple, 
                  seed: Optional[int] = 4, 
@@ -54,10 +56,11 @@ class SerializeTwoCodonMultiTranscript():
         self.params["transcript_data"] = []
         self.params["trna_proportion"] = {"TTT": self.trna1, "ATA": self.trna2}
         self.params["config_filename"] = self._format_filename()
-        for (len, codon_comp) in zip(transcript_lens, codon_comps):
+        for (len, codon_comp, name) in zip(transcript_lens, codon_comps, transcript_names):
             data = {}
             data["transcript_seq"] = self._format_transcript(len, codon_comp)
             data["transcript_len"] = len
+            data["transcript_name"] = name
             self.params["transcript_data"].append(data)
 
     def _format_transcript(self, len, codon_comp):
