@@ -1,9 +1,9 @@
 import sys
 from trnasimtools.simulate import SimulateTwoCodonMultiTranscript
 
-transcript_copy_numbers = [sys.argv[3], sys.argv[4]]
-ribosome_binding_rates = [sys.argv[7], sys.argv[8]]
-trna_charging_rates = [sys.argv[9], sys.argv[10]]
+transcript_copy_numbers = [int(sys.argv[3]), int(sys.argv[4])]
+ribosome_binding_rates = [float(sys.argv[7]), float(sys.argv[8])]
+trna_charging_rates = [float(sys.argv[9]), float(sys.argv[10])]
 
 simulator = SimulateTwoCodonMultiTranscript(config_file=sys.argv[1],
                                              seed=int(sys.argv[2]),
