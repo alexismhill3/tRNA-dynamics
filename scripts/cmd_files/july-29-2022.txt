@@ -1,0 +1,2 @@
+python3 twocodonmultitranscript.py ../yaml/july-29-2022/two_codon_multi_transcript_0.8_0.2_0.2_0.8_0.8_0.2.yaml 1 50 50 100 100 100000.0 10000.0 1000000.0 1000000.0 ../output/july-29-2022
+python3 twocodonmultitranscript.py ../yaml/july-29-2022/two_codon_multi_transcript_0.5_0.5_0.5_0.5_0.5_0.5.yaml 1 50 50 100 100 100000.0 10000.0 1000000.0 1000000.0 ../output/july-29-2022
