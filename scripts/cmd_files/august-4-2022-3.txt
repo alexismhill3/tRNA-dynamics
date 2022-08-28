@@ -1,0 +1,15 @@
+python3 twocodonmultitranscript.py ../yaml/august-4-2022/two_codon_multi_transcript_0.5_0.5_0.5_0.5_0.5_0.5.yaml 1 100 10 100 1000 10000.0 10000.0 100.0 100.0 ../output/august-4-2022
+python3 twocodonmultitranscript.py ../yaml/august-4-2022/two_codon_multi_transcript_0.5_0.5_0.5_0.5_0.5_0.5.yaml 2 100 10 100 1000 10000.0 10000.0 100.0 100.0 ../output/august-4-2022
+python3 twocodonmultitranscript.py ../yaml/august-4-2022/two_codon_multi_transcript_0.5_0.5_0.5_0.5_0.5_0.5.yaml 3 100 10 100 1000 10000.0 10000.0 100.0 100.0 ../output/august-4-2022
+python3 twocodonmultitranscript.py ../yaml/august-4-2022/two_codon_multi_transcript_0.5_0.5_0.5_0.5_0.5_0.5.yaml 1 100 20 100 1000 10000.0 10000.0 100.0 100.0 ../output/august-4-2022
+python3 twocodonmultitranscript.py ../yaml/august-4-2022/two_codon_multi_transcript_0.5_0.5_0.5_0.5_0.5_0.5.yaml 2 100 20 100 1000 10000.0 10000.0 100.0 100.0 ../output/august-4-2022
+python3 twocodonmultitranscript.py ../yaml/august-4-2022/two_codon_multi_transcript_0.5_0.5_0.5_0.5_0.5_0.5.yaml 3 100 20 100 1000 10000.0 10000.0 100.0 100.0 ../output/august-4-2022
+python3 twocodonmultitranscript.py ../yaml/august-4-2022/two_codon_multi_transcript_0.5_0.5_0.5_0.5_0.5_0.5.yaml 1 100 30 100 1000 10000.0 10000.0 100.0 100.0 ../output/august-4-2022
+python3 twocodonmultitranscript.py ../yaml/august-4-2022/two_codon_multi_transcript_0.5_0.5_0.5_0.5_0.5_0.5.yaml 2 100 30 100 1000 10000.0 10000.0 100.0 100.0 ../output/august-4-2022
+python3 twocodonmultitranscript.py ../yaml/august-4-2022/two_codon_multi_transcript_0.5_0.5_0.5_0.5_0.5_0.5.yaml 3 100 30 100 1000 10000.0 10000.0 100.0 100.0 ../output/august-4-2022
+python3 twocodonmultitranscript.py ../yaml/august-4-2022/two_codon_multi_transcript_0.5_0.5_0.5_0.5_0.5_0.5.yaml 1 100 40 100 1000 10000.0 10000.0 100.0 100.0 ../output/august-4-2022
+python3 twocodonmultitranscript.py ../yaml/august-4-2022/two_codon_multi_transcript_0.5_0.5_0.5_0.5_0.5_0.5.yaml 2 100 40 100 1000 10000.0 10000.0 100.0 100.0 ../output/august-4-2022
+python3 twocodonmultitranscript.py ../yaml/august-4-2022/two_codon_multi_transcript_0.5_0.5_0.5_0.5_0.5_0.5.yaml 3 100 40 100 1000 10000.0 10000.0 100.0 100.0 ../output/august-4-2022
+python3 twocodonmultitranscript.py ../yaml/august-4-2022/two_codon_multi_transcript_0.5_0.5_0.5_0.5_0.5_0.5.yaml 1 100 50 100 1000 10000.0 10000.0 100.0 100.0 ../output/august-4-2022
+python3 twocodonmultitranscript.py ../yaml/august-4-2022/two_codon_multi_transcript_0.5_0.5_0.5_0.5_0.5_0.5.yaml 2 100 50 100 1000 10000.0 10000.0 100.0 100.0 ../output/august-4-2022
+python3 twocodonmultitranscript.py ../yaml/august-4-2022/two_codon_multi_transcript_0.5_0.5_0.5_0.5_0.5_0.5.yaml 3 100 50 100 1000 10000.0 10000.0 100.0 100.0 ../output/august-4-2022
