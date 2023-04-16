@@ -15,11 +15,11 @@ class SerializeSingleCodonSingleTranscript():
         self.transcript_len = transcript_len
         
         self.params = {}
-        self.params["trna_charging_rate"] = trna_charging_rate,
-        self.params["ribosome_binding_rate"] = ribosome_binding_rate,
-        self.params["ribosome_copy_number"] = ribosome_copy_number,
-        self.params["transcript_copy_number"] = transcript_copy_number,
-        self.params["total_trna"] = total_trna,
+        self.params["trna_charging_rate"] = trna_charging_rate
+        self.params["ribosome_binding_rate"] = ribosome_binding_rate
+        self.params["ribosome_copy_number"] = ribosome_copy_number
+        self.params["transcript_copy_number"] = transcript_copy_number
+        self.params["total_trna"] = total_trna
         
         self.params["config_filename"] = self._format_filename()
         self.params["transcript_data"] = [{}]
@@ -33,9 +33,9 @@ class SerializeSingleCodonSingleTranscript():
 
     def _format_filename(self):
         base = "two_codon_single_transcript"
-        return f"{base}_{self.params["transcript_copy_number"]}_{self.params["ribosome_copy_number"]}" + \
-               f"_{self.params["total_trna"]}_{self.params["ribosome_binding_rate"}" + \
-               f"_{self.params["trna_charging_rate"]}.yaml"
+        return f"{base}_{self.params['transcript_copy_number']}_{self.params['ribosome_copy_number']}" + \
+               f"_{self.params['total_trna']}_{self.params['ribosome_binding_rate']}" + \
+               f"_{self.params['trna_charging_rate']}.yaml"
     
     def filename(self):
         return self._format_filename()

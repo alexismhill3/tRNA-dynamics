@@ -9,7 +9,7 @@ class SimulateSingleCodonSingleTranscript():
                 config_file: str, 
                 seed: int,
                 ribosome_params: Optional[Tuple] = (1, 15), # speed, footprint
-                cell_volume: Optional[float] = 8e-16,
+                cell_volume: Optional[float] = 8e-16
                 ):
         self.sim_data = self._load_config(config_file)
         self.seed = seed
@@ -30,7 +30,7 @@ class SimulateSingleCodonSingleTranscript():
     
     def _add_trna(self):
         tRNA = {"AAA": {"TTT": {"charged": self.sim_data["total_trna"], "uncharged": 0}},}
-        self.model.add_trna(tRNA, self.sim_data["charging_rate"])
+        self.model.add_trna(tRNA, self.sim_data["trna_charging_rate"])
     
     def _add_ribosomes(self):
         speed, footprint = self.ribosome_params
@@ -43,11 +43,7 @@ class SimulateSingleCodonSingleTranscript():
     def filename(self):
         return self._format_filename()
 
-    def simulate(self, output_dir: str, time_limit: Optional[int] = None, time_step: Optional[float] = None):
-        if time_limit is None:
-            time_limit = self.simulation_data["time_limit"]
-        if time_step is None:
-            time_step = self.simulation_data["time_step"]
+    def simulate(self, output_dir: str, time_limit: int, time_step: float):
         self.model.seed(self.seed)
         self._add_transcripts()
         self._add_trna()
