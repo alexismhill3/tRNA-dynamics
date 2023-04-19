@@ -32,7 +32,7 @@ class SerializeSingleCodonSingleTranscript():
         return "A"*30 + "".join(codons) + "A"*20
 
     def _format_filename(self):
-        base = "two_codon_single_transcript"
+        base = "single_codon_single_transcript"
         return f"{base}_{self.params['transcript_copy_number']}_{self.params['ribosome_copy_number']}" + \
                f"_{self.params['total_trna']}_{self.params['ribosome_binding_rate']}" + \
                f"_{self.params['trna_charging_rate']}.yaml"
