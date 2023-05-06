@@ -1,0 +1,53 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+```
+```{r}
+# simulation parameters
+time_limit <- 500
+time_step <- 5
+transcript_len <- 100
+trna_props <- c(1, 2, 5, 10, 20, 30, 40, 45, 48, 49, 50, 51, 52, 55, 60, 70, 80, 90, 95, 98, 99)
+codon_comps <- 1:99
+transcript_copy_number <- 100
+ribosome_copy_number <- 100
+total_trna <- 100
+ribosome_binding_rate <- 100000.0
+trna_charging_rates <- c(10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0)
+```
+
+```{r}
+df_main <- read_csv("../processed_data/may-3-2022-averages-500-s.csv")
+```
+
+```{r}
+proteinX_odds_transformed <- df_main %>%
+  filter(species == "proteinX") %>%
+  mutate(codon_odds = codon_comp / (100 - codon_comp)) %>%
+  mutate(tRNA_odds = tRNA_prop / (100 - tRNA_prop)) %>%
+  mutate(tRNA_odds = round(tRNA_odds, digits = 2)) %>%
+  mutate(tRNA_charging_rate = as.double(tRNA_charging_rate)) %>%
+  mutate(charging_rbs_ratio = tRNA_charging_rate / ribosome_binding_rate)
+```
+
+```{r}
+tRNA_prop_values <- c(50, 55, 60, 70, 80, 90, 95, 98, 99)
+proteinX_tRNA_second_half <- proteinX_odds_transformed %>% 
+  filter(tRNA_prop %in% tRNA_prop_values)
+```
+
+```{r}
+ggplot(data = proteinX_tRNA_second_half) +
+  geom_line(mapping = aes(x = codon_odds, y = protein, group = tRNA_odds, color = tRNA_odds)) +
+  facet_wrap(~ charging_rbs_ratio, nrow = 2, scales = "free_y") +
+  scale_x_continuous(trans = "log10", labels = scales::label_math(format = log10)) +
+  scale_color_viridis_c(trans = "log10", direction = -1, breaks = c(1, 10, 100), labels = scales::label_math(format = log10)) +
+  ylab("Simulated protein") + xlab("Codon odds") +
+  theme_bw() +
+  labs(color = "tRNA odds")
+```
+
