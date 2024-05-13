@@ -175,7 +175,7 @@ class SimulateTwoCodonMultiTranscript():
     
     def _add_ribosomes(self):
         speed, footprint = self.ribosome_params
-        self.model.add_ribosome(copy_number=self.ribosome_copy_number, speed=speed, footprint=footprint)
+        self.model.add_ribosome(footprint=footprint, speed=speed, copy_number=self.ribosome_copy_number)
     
     def _format_filename(self):
         base = self.simulation_data["config_filename"].split(".yaml")[0]

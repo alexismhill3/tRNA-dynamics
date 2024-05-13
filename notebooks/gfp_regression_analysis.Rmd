@@ -1,0 +1,236 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(broom)
+
+df <- read_csv("../notebooks/regression_charging_rate.csv")
+df
+
+ggplot(df, aes(GFP, cellularProtein_norm, color = factor(codon))) +
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE, formula = y ~ x + 1, fullrange=TRUE) +
+  facet_wrap(~charging_rate) +
+  xlab("transgene expression") +
+  ylab("norm e.coli expression") +
+  scale_x_continuous(limits=c(0, 10000)) + scale_y_continuous(limits=c(0.8, 1.0)) +
+  scale_color_discrete_sequential(name="transgene \npref. codon\nuse (%)", palette = "viridis") +
+  theme_bw()
+ggsave("gfp_ecoli_charging.png")
+```
+
+```{r}
+df1 <- read_csv("../notebooks/regression_charging_rate.csv")
+df2 <- read_csv("../notebooks/regression_charging_rate_2.csv")
+
+models <- df1 %>%
+#    filter(codon != 0.5) %>%
+    group_by(charging_rate) %>%
+    do(tidy(lm(data = ., formula = cellularProtein_norm ~ factor(codon):GFP)))
+
+models_2 <- df2 %>%
+    filter(codon != 0.5) %>%
+    group_by(charging_rate) %>%
+    do(tidy(lm(data = ., formula = cellularProtein_norm ~ factor(codon):GFP)))
+
+models %>%
+  filter(term != "(Intercept)") %>% 
+  mutate(term = recode(term, `factor(codon)0.1:GFP` = 0.1,
+                       `factor(codon)0.3:GFP` = 0.3,
+                       `factor(codon)0.5:GFP` = 0.5,
+                       `factor(codon)0.7:GFP` = 0.7,
+                       `factor(codon)0.9:GFP` = 0.9)) %>%
+  mutate(estimate = estimate*-1) %>%
+  ggplot(aes(term, estimate, color=as.factor(charging_rate))) +
+  geom_point(size=3) +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_color_discrete_sequential(palette="SunsetDark", name="charging rate") +
+  scale_x_continuous(name="transgene pref. codon use",
+                     breaks=c(0.1, 0.3, 0.5, 0.7, 0.9)) +
+  scale_y_continuous(name="change e.coli expression") +
+  theme_bw()
+ggsave("change_ecoli_expression_charging.png")
+```
+```{r}
+coef1 <- models %>%
+  filter(term != "(Intercept)") %>% 
+  mutate(term = recode(term, `factor(codon)0.1:GFP` = 0.1,
+                       `factor(codon)0.3:GFP` = 0.3,
+                       `factor(codon)0.5:GFP` = 0.5,
+                       `factor(codon)0.7:GFP` = 0.7,
+                       `factor(codon)0.9:GFP` = 0.9)) %>%
+  #mutate(estimate = estimate*-1) %>%
+  group_by(charging_rate) %>%
+  do(tidy(lm(data = ., formula = estimate ~ term))) %>%
+  filter(term != "(Intercept)") %>% 
+  #mutate(estimate = estimate*-1) %>%
+  mutate(speed=3)
+
+coef2 <- models_2 %>%
+  filter(term != "(Intercept)") %>% 
+  mutate(term = recode(term, `factor(codon)0.1:GFP` = 0.1,
+                       `factor(codon)0.3:GFP` = 0.3,
+                       `factor(codon)0.5:GFP` = 0.5,
+                       `factor(codon)0.7:GFP` = 0.7,
+                       `factor(codon)0.9:GFP` = 0.9)) %>%
+  #mutate(estimate = estimate*-1) %>%
+  group_by(charging_rate) %>%
+  do(tidy(lm(data = ., formula = estimate ~ term))) %>%
+  filter(term != "(Intercept)") %>% 
+  #mutate(estimate = estimate*-1) %>%
+  mutate(speed=0.5)
+
+sens <- rbind(coef1, coef2)
+sens
+```
+
+```{r}
+sens %>%
+  #filter(speed != 0.5) %>%
+  ggplot(aes(x=charging_rate, y=estimate, color=as.factor(speed))) + 
+  geom_point(size=2.5) +
+  scale_x_continuous(trans="log10", name="charging rate") +
+  scale_y_continuous(trans="log10", name="codon sensitivity", limits = c(0.0000005, 0.0001)) +
+  scale_color_manual(name="ribosome speed", values=c("#6499fc", "#fc6c64")) +
+  theme_bw() +
+  theme(legend.position = "none")
+  
+#ggsave("charging_sensivity_speeds.png")
+```
+
+
+```{r}
+library(tidyverse)
+library(broom)
+
+df <- read_csv("../notebooks/regression_med_rib_binding.csv") %>% filter(bind_rate > 3000)
+df
+
+ggplot(df, aes(GFP, cellularProtein_norm, color = factor(codon))) +
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE, formula = y ~ x + 1, fullrange=TRUE) +
+  facet_wrap(~bind_rate) +
+  scale_x_continuous(limits = c(0, 30000)) +
+  scale_y_continuous(limits = c(0.8, 1.0)) +
+  xlab("transgene expression") +
+  ylab("norm e.coli expression") +
+  scale_color_discrete_sequential(name="transgene \npref. codon\nuse (%)", palette = "viridis") +
+  theme_bw()
+#ggsave("gfp_ecoli_charging.png")
+
+models <- df %>%
+#    filter(codon != 0.5) %>%
+    group_by(bind_rate) %>%
+    do(tidy(lm(data = ., formula = cellularProtein_norm ~ factor(codon):GFP)))
+
+models %>%
+  filter(term != "(Intercept)") %>% 
+  mutate(term = recode(term, `factor(codon)0.1:GFP` = 0.1,
+                       `factor(codon)0.3:GFP` = 0.3,
+                       `factor(codon)0.5:GFP` = 0.5,
+                       `factor(codon)0.7:GFP` = 0.7,
+                       `factor(codon)0.9:GFP` = 0.9)) %>%
+  mutate(estimate = estimate*-1) %>%
+  ggplot(aes(term, estimate, color=as.factor(bind_rate))) +
+  geom_point(size=3) +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_color_discrete_sequential(palette="SunsetDark", name="ribosome copy") +
+  scale_x_continuous(name="transgene pref. codon use",
+                     breaks=c(0.1, 0.3, 0.5, 0.7, 0.9)) +
+  scale_y_continuous(name="change e.coli expression") +
+  theme_bw()
+
+coef1 <- models %>%
+  filter(term != "(Intercept)") %>% 
+  mutate(term = recode(term, `factor(codon)0.1:GFP` = 0.1,
+                       `factor(codon)0.3:GFP` = 0.3,
+                       `factor(codon)0.5:GFP` = 0.5,
+                       `factor(codon)0.7:GFP` = 0.7,
+                       `factor(codon)0.9:GFP` = 0.9)) %>%
+  #mutate(estimate = estimate*-1) %>%
+  group_by(bind_rate) %>%
+  do(tidy(lm(data = ., formula = estimate ~ term))) %>%
+  filter(term != "(Intercept)") %>%
+  #mutate(estimate = estimate*-1) %>%
+  mutate(condition = 300)
+```
+```{r}
+coef1 %>%
+  ggplot(aes(x=bind_rate, y=estimate)) + 
+  geom_point(size=2.5) +
+  scale_x_continuous(trans="log10", name="ribosome copy") +
+  scale_y_continuous(trans="log10", name="codon sensitivity") +
+  theme_bw()
+```
+
+```{r}
+library(tidyverse)
+library(broom)
+
+df <- read_csv("../notebooks/regression_med_rib_binding_v2.csv") %>% filter(bind_rate > 3000)
+df
+
+ggplot(df, aes(GFP, cellularProtein_norm, color = factor(codon))) +
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE, formula = y ~ x + 1, fullrange=TRUE) +
+  facet_wrap(~bind_rate) +
+  scale_x_continuous(limits = c(0, 30000)) +
+  scale_y_continuous(limits = c(0.8, 1.0)) +
+  xlab("transgene expression") +
+  ylab("norm e.coli expression") +
+  scale_color_discrete_sequential(name="transgene \npref. codon\nuse (%)", palette = "viridis") +
+  theme_bw()
+#ggsave("gfp_ecoli_charging.png")
+
+models <- df %>%
+#    filter(codon != 0.5) %>%
+    group_by(bind_rate) %>%
+    do(tidy(lm(data = ., formula = cellularProtein_norm ~ factor(codon):GFP)))
+
+models %>%
+  filter(term != "(Intercept)") %>% 
+  mutate(term = recode(term, `factor(codon)0.1:GFP` = 0.1,
+                       `factor(codon)0.3:GFP` = 0.3,
+                       `factor(codon)0.5:GFP` = 0.5,
+                       `factor(codon)0.7:GFP` = 0.7,
+                       `factor(codon)0.9:GFP` = 0.9)) %>%
+  mutate(estimate = estimate*-1) %>%
+  ggplot(aes(term, estimate, color=as.factor(bind_rate))) +
+  geom_point(size=3) +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_color_discrete_sequential(palette="SunsetDark", name="ribosome copy") +
+  scale_x_continuous(name="transgene pref. codon use",
+                     breaks=c(0.1, 0.3, 0.5, 0.7, 0.9)) +
+  scale_y_continuous(name="change e.coli expression") +
+  theme_bw()
+
+coef2 <- models %>%
+  filter(term != "(Intercept)") %>% 
+  mutate(term = recode(term, `factor(codon)0.1:GFP` = 0.1,
+                       `factor(codon)0.3:GFP` = 0.3,
+                       `factor(codon)0.5:GFP` = 0.5,
+                       `factor(codon)0.7:GFP` = 0.7,
+                       `factor(codon)0.9:GFP` = 0.9)) %>%
+  #mutate(estimate = estimate*-1) %>%
+  group_by(bind_rate) %>%
+  do(tidy(lm(data = ., formula = estimate ~ term))) %>%
+  filter(term != "(Intercept)") %>%
+  #mutate(estimate = estimate*-1) %>%
+  mutate(condition = 1000)
+```
+
+```{r}
+sens <- rbind(coef1, coef2)
+sens %>% 
+  ggplot(aes(x=bind_rate, y=estimate, color=as.factor(condition))) + 
+  geom_point(size=2.5) +
+  scale_x_continuous(trans="log10", name="binding rate") +
+  scale_y_continuous(trans="log10", name="codon sensitivity") +
+  scale_color_manual(name="charging rate", values=c("#6499fc", "#fc6c64")) +
+  theme_bw() +
+  theme(legend.position = "none")
+```
+

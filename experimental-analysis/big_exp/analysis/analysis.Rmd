@@ -1,0 +1,77 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(patchwork)
+library(slider)
+library(data.table)
+```
+
+```{r}
+files_gfp = c('day_1_gfp_clean.csv', 'day_2_gfp_clean.csv', 'day_3_gfp_clean.csv')
+files_mch = c('day_1_mch_clean.csv', 'day_2_mch_clean.csv', 'day_3_mch_clean.csv')
+
+gfp_times <- c(60*60*2.25,60*60*2.75)
+mch_times <- c(60*60*2.50,60*60*3)
+
+
+filenames <- c(files_gfp, files_mch)
+
+experiment_ID <- 0
+```
+
+```{r}
+# Combine data into a complete dataframe with normalized valuies   ----------------------
+master_df = data.frame()
+for (filename in files_gfp){
+  csv_data <- read.csv(filename) # Load in the data
+  experiment_ID <- experiment_ID + 1
+  
+  # Merge technical replicates
+  csv_data <- csv_data %>% group_by(strain, rbs, time)
+  csv_data <- csv_data %>% dplyr::summarize(GFP_high = mean(GFP_high), GFP_low = mean(GFP_low), OD600 = mean(OD600))
+  
+  
+  # Create a normalized fluorescence value
+  tmp_df <- csv_data %>% filter(is.finite(OD600)) %>% filter(is.finite(GFP_high)) %>% filter(is.finite(GFP_low))
+  conversion = lm(formula = GFP_high ~ GFP_low, data = tmp_df)
+  linearconversion <- function(v_low, v_high){
+    y <- as.numeric()
+    if (is.finite(v_high)){
+      y <- v_high
+    }
+    else{
+      y <- as.numeric(coef(conversion)[1]) + as.numeric(coef(conversion)[2])*v_low
+    }
+    y
+  }
+  csv_data$fluor_norm <- mapply(csv_data$GFP_low, csv_data$GFP_high, FUN=linearconversion)
+  csv_data$fluor_norm <- csv_data$fluor_norm/csv_data$OD600
+  csv_data$lnOD600 <- log(csv_data$OD600)
+  csv_data$experiment <- experiment_ID
+  csv_data$groupID <- paste(csv_data$experiment, 
+                            csv_data$strain,
+                            csv_data$rbs)
+  
+    # Fix time
+  csv_data$time <- round(csv_data$time/900)*900
+  
+  # Create sliding windows
+  processed_data <- data.frame()
+  for (sample in unique(csv_data$groupID)){
+    subset <- csv_data %>% filter(groupID == sample)
+    subset$expression <- c(NaN, 3600*diff(subset$fluor_norm)/900)
+    subset$growthrate <- c(NaN, 3600*diff(subset$lnOD600)/900)
+    processed_data <- rbind(processed_data, subset)
+  }
+  
+  # Add it to the master dataframe
+  master_df = rbind(master_df, processed_data)
+}
+```
+
