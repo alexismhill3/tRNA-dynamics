@@ -1,0 +1,135 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(broom)
+```
+
+```{r}
+df <- read_csv("gfp_regression_speed.csv")
+df
+```
+```{r}
+# make plot of simulation output that is analogous to experiments
+# `charging_rate` and `speed` are free parameters--this is about what I usually pick when I make this plot
+df_exp <- df %>% filter(charging_rate == 300, speed == 0.5)
+
+df_exp %>%
+  ggplot(aes(GFP, cellularProtein, color = factor(codon))) +
+    geom_point(size=2.5) + 
+    geom_line(linewidth=1) +
+    xlab("transgene expression") +
+    ylab("cellular gene expression") +
+    scale_color_discrete_sequential(name="preferred codon use\n(transgene)", 
+                                    palette = "viridis",
+                                    breaks=c('0.9', '0.7', '0.5', '0.3', '0.1'),
+                                    labels = c("0.1" = "10%",
+                                               "0.3" = "30%",
+                                               "0.5" = "50%",
+                                               "0.7" = "70%",
+                                               "0.9" = "90%")) +
+    theme_bw()
+ggsave("figures/calibrated_simulation_output.png")
+```
+
+```{r}
+# "sim calibration" plots
+
+# plot species steady-states (when GFP RBS is << E. coli RBS)
+# basically the "control" (GFP is present but not highly expressed)
+df_ss <- read_csv("steady_states.csv")
+df_ss <- df_ss %>% 
+          pivot_wider(names_from = species, 
+                      values_from=protein, 
+                      id_cols = time) %>%
+          mutate(`preferred tRNA` = TTT_charged / 1750,
+                 `rare tRNA` = ATA_charged / 750,
+                 `free ribosomes` = `free ribosome` / 500) %>%
+          pivot_longer(cols = c(`preferred tRNA`, `rare tRNA`, `free ribosomes`), 
+                       names_to = c("species"), 
+                       values_to = c("fraction")) %>%
+          select(time, species, fraction)
+
+df_ss %>%
+  ggplot(aes(x = time, y = fraction, color = species)) +
+  geom_line(linewidth=1) + 
+  scale_color_manual(values = c("#4ebf85", "#ed90a4", "#27bbd8"),
+                      name="",
+                      breaks=c("preferred tRNA",
+                                "rare tRNA",
+                                "free ribosomes")) +
+  scale_y_continuous(name="counts (fraction total)") +
+  scale_x_continuous(name="simulation time") +
+  theme_bw()
+
+ggsave("figures/steady_states.png")
+
+# make species counts table
+# average values for E. coli are from literature
+df_params <- tibble(species = c("tRNA", "ribosomes", "transcripts", "tRNA", "ribosomes", "transcripts"),
+                    values = c(375000, 70000, 5000, 2500, 500, 100),
+                    group = c("E. coli", "E. coli", "E. coli", "simulation", "simulation", "simulation"))
+
+ecol <- df_params %>% filter(group == "E. coli") %>%
+        ggplot(aes(x = fct_reorder(species, -values), y = values)) +
+          geom_col() +
+          scale_x_discrete(name="") +
+          scale_y_continuous(name="average count",
+                             breaks=c(1e5, 2e5, 3e5),
+                             labels=c("100K", "200K", "300K")) +
+          theme_bw() +
+          labs(title="E. coli")
+
+
+sim <- df_params %>% filter(group == "simulation") %>%
+        ggplot(aes(x = fct_reorder(species, -values), y = values)) +
+          geom_col() +
+          scale_x_discrete(name="") +
+          scale_y_continuous(name="count",
+                             breaks=c(1000, 2000),
+                             ) +
+          theme_bw() +
+          labs(title="Simulation")
+
+cowplot::plot_grid(ecol, sim)
+ggsave("figures/species_parameters.png")
+```
+```{r, fig.width=5.5, fig.height=4.5}
+trna_count <- tibble(tRNA = c("ACG", "CCG", "UCU", "CCU", "ACG", "CCG", "UCU", "CCU"),
+                     count = c(0.7, 0.1, 0.13, 0.07, 0.83, 0.08, 0.04, 0.08),
+                     group = c("anticodon", "anticodon", "anticodon", "anticodon", "codon", "codon", "codon", "codon"))
+
+trna_count %>%
+  filter(group == "codon") %>%
+  ggplot(aes(x = fct_reorder(tRNA, -count), y = count, fill=group)) +
+  geom_col(position = "dodge") +
+  theme_bw() +
+  xlab("") +
+  ylab("% total") +
+  #ggtitle("threonine tRNA composition, E. coli")+
+  scale_fill_manual(name = "", values = c("#01ad9a"), labels = c("cooresponding codon use,\nhighly expressed genes"))
+  #theme(legend.position = "none")
+```
+
+
+```{r, fig.height=3, fig.width=9}
+df %>% filter(charging_rate %in% c(30, 100, 300, 1000, 3000), speed == 2) %>%
+  ggplot(aes(GFP, cellularProtein_norm, color = factor(codon))) +
+    geom_point(size=1.5) + 
+    geom_line() +
+    #geom_line() +
+    #geom_smooth(method = "lm", se = FALSE, formula = y ~ x + 1, fullrange=TRUE) +
+    facet_wrap(~charging_rate, ncol=5) +
+    xlab("transgene expression") +
+    ylab("norm e.coli expression") +
+    scale_y_continuous(limits = c(0.8, 1)) +
+    scale_x_continuous(breaks= c(5000 , 10000)) +
+    #scale_x_continuous(limits=c(0, 10000)) + scale_y_continuous(limits=c(0.8, 1.0)) +
+    scale_color_discrete_sequential(name="transgene pref.\ncodon use (%)", palette = "viridis") +
+    theme_bw() +
+    theme(legend.position = "bottom")
+```
+

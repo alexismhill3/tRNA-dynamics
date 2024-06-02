@@ -12,96 +12,9 @@ library(broom)
 df <- read_csv("gfp_regression_speed.csv")
 df
 ```
-```{r}
-# make plot of simulation output that is analogous to experiments
-# `charging_rate` and `speed` are free parameters--this is about what I usually pick when I make this plot
-df_exp <- df %>% filter(charging_rate == 300, speed == 0.5)
-
-df_exp %>%
-  ggplot(aes(GFP, cellularProtein, color = factor(codon))) +
-    geom_point(size=2.5) + 
-    geom_line(linewidth=1) +
-    xlab("transgene expression") +
-    ylab("cellular gene expression") +
-    scale_color_discrete_sequential(name="preferred codon use\n(transgene)", 
-                                    palette = "viridis",
-                                    breaks=c('0.9', '0.7', '0.5', '0.3', '0.1'),
-                                    labels = c("0.1" = "10%",
-                                               "0.3" = "30%",
-                                               "0.5" = "50%",
-                                               "0.7" = "70%",
-                                               "0.9" = "90%")) +
-    theme_bw()
-ggsave("calibrated_simulation_output.png")
-```
-
-```{r}
-# "sim calibration" plots
-
-# plot species steady-states (when GFP RBS is << E. coli RBS)
-# basically the "control" (GFP is present but not highly expressed)
-df_ss <- read_csv("steady_states.csv")
-df_ss <- df_ss %>% 
-          pivot_wider(names_from = species, 
-                      values_from=protein, 
-                      id_cols = time) %>%
-          mutate(`preferred tRNA` = TTT_charged / 1750,
-                 `rare tRNA` = ATA_charged / 750,
-                 `free ribosomes` = `free ribosome` / 500) %>%
-          pivot_longer(cols = c(`preferred tRNA`, `rare tRNA`, `free ribosomes`), 
-                       names_to = c("species"), 
-                       values_to = c("fraction")) %>%
-          select(time, species, fraction)
-
-df_ss %>%
-  ggplot(aes(x = time, y = fraction, color = species)) +
-  geom_line(linewidth=1) + 
-  scale_color_manual(values = c("#4ebf85", "#ed90a4", "#27bbd8"),
-                      name="",
-                      breaks=c("preferred tRNA",
-                                "rare tRNA",
-                                "free ribosomes")) +
-  scale_y_continuous(name="counts (fraction total)") +
-  scale_x_continuous(name="simulation time") +
-  theme_bw()
-
-ggsave("steady_states.png")
-
-# make species counts table
-# average values for E. coli are from literature
-df_params <- tibble(species = c("tRNA", "ribosomes", "transcripts", "tRNA", "ribosomes", "transcripts"),
-                    values = c(375000, 70000, 5000, 2500, 500, 100),
-                    group = c("E. coli", "E. coli", "E. coli", "simulation", "simulation", "simulation"))
-
-ecol <- df_params %>% filter(group == "E. coli") %>%
-        ggplot(aes(x = fct_reorder(species, -values), y = values)) +
-          geom_col() +
-          scale_x_discrete(name="") +
-          scale_y_continuous(name="average count",
-                             breaks=c(1e5, 2e5, 3e5),
-                             labels=c("100K", "200K", "300K")) +
-          theme_bw() +
-          labs(title="E. coli")
-
-
-sim <- df_params %>% filter(group == "simulation") %>%
-        ggplot(aes(x = fct_reorder(species, -values), y = values)) +
-          geom_col() +
-          scale_x_discrete(name="") +
-          scale_y_continuous(name="count",
-                             breaks=c(1000, 2000),
-                             ) +
-          theme_bw() +
-          labs(title="Simulation")
-
-cowplot::plot_grid(ecol, sim)
-ggsave("species_parameters.png")
-```
-
-
 
 ```{r, fig.height=3, fig.width=9}
-df %>% filter(charging_rate %in% c(30, 100, 300, 1000, 3000), speed == 2) %>%
+df %>% filter(charging_rate %in% c(30, 100, 300, 1000, 3000), speed == 0.5) %>%
   ggplot(aes(GFP, cellularProtein_norm, color = factor(codon))) +
     geom_point(size=1.5) + 
     geom_line() +
@@ -111,7 +24,7 @@ df %>% filter(charging_rate %in% c(30, 100, 300, 1000, 3000), speed == 2) %>%
     xlab("transgene expression") +
     ylab("norm e.coli expression") +
     scale_y_continuous(limits = c(0.8, 1)) +
-    scale_x_continuous(breaks= c(5000 , 10000)) +
+    scale_x_continuous(breaks= c(1000 , 5000)) +
     #scale_x_continuous(limits=c(0, 10000)) + scale_y_continuous(limits=c(0.8, 1.0)) +
     scale_color_discrete_sequential(name="transgene pref.\ncodon use (%)", palette = "viridis") +
     theme_bw() +
@@ -184,6 +97,29 @@ models %>%
   scale_y_continuous(name="change e.coli expression") +
   theme_bw()
 ```
+```{r, fig.width=7, fig.height=4}
+models %>%
+  filter(term != "(Intercept)") %>% 
+  mutate(term = recode(term, `factor(codon)0.1:GFP` = 0.1,
+                       `factor(codon)0.3:GFP` = 0.3,
+                       `factor(codon)0.5:GFP` = 0.5,
+                       `factor(codon)0.7:GFP` = 0.7,
+                       `factor(codon)0.9:GFP` = 0.9)) %>%
+  filter(speed == 2) %>%
+  mutate(estimate = estimate*-1) %>%
+  ungroup() %>%
+  ggplot(aes(term, estimate, color=as.factor(charging_rate))) +
+  #facet_wrap(~speed) +
+  geom_point(size=3) +
+  geom_smooth(method = "lm", se = FALSE, formula = y ~ x) +
+  scale_color_discrete_sequential(palette="SunsetDark", name="charging rate") +
+  scale_x_continuous(name="transgene pref. codon use",
+                     breaks=c(0.1, 0.3, 0.5, 0.7, 0.9)) +
+  scale_y_continuous(name="change e.coli expression") +
+  theme_bw()
+```
+
+
 ```{r}
 coef <- models %>%
   filter(term != "(Intercept)") %>% 
@@ -199,28 +135,55 @@ coef <- models %>%
 coef
 ```
 
-```{r}
+```{r, fig.width=7, fig.height=4.5}
 colors <- c( '#C4DDF8', '#4BABED', '#2A6B97', '#183044')
 
-#colors <- c('#E0ECFA', '#9EBFDF', '#5986AA', '#1F4158')
-
-#colors <- c('#CDE2F9', '#82B9E7', '#447FA9', '#1E4864')
-
-
-coef %>%
+speed_loglog <- coef %>%
+  filter(charging_rate > 10) %>%
   ggplot(aes(x=charging_rate, y=estimate, color=factor(speed))) + 
   geom_point(size=2.5) +
+  geom_line(linewidth=1) +
   scale_x_continuous(trans="log10", 
                      name="charging rate",
                      breaks=c(10, 30, 100, 300, 1000, 3000, 10000),
                      labels=c("10", "30", "100", "300", "1000", "3000", "10000"),
                      expand = expansion(mult = c(0.1, 0.1))) +
   scale_y_continuous(trans="log10", 
-                     name="codon sensitivity", 
-                     limits = c(0.0000005, 0.0004),
+                     name="recoding sensitivity", 
+                     limits = c(1e-6, 1e-4),
                      expand = expansion(mult = c(0.05, 0.05))) +
   scale_color_manual(values = colors, name = "speed") +
-  coord_fixed(ratio=1) +
+  #scale_color_manual(values = c("#2A6B97"), name = "speed") +
+  #coord_fixed(ratio=1) +
+  theme_linedraw() +
+  theme(axis.title = element_text(size = 12),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size=12),
+        panel.background = element_rect(color="grey70"),
+        panel.grid.minor.x = element_blank(),
+        axis.line = element_line(color="black"),
+        axis.ticks = element_blank(),
+        legend.position = "None")
+```
+
+```{r}
+speed_logx <- coef %>%
+  filter(charging_rate > 10) %>%
+  ggplot(aes(x=charging_rate, y=estimate, color=factor(speed))) + 
+  geom_point(size=2.5) +
+  geom_line(linewidth=1) +
+  scale_x_continuous(trans="log10", 
+                     name="charging rate",
+                     breaks=c(30, 100, 300, 1000, 3000, 10000),
+                     labels=c("30", "100", "300", "1000", "3000", "10000"),
+                     expand = expansion(mult = c(0.1, 0.1))) +
+  scale_y_continuous( 
+                     name="recoding sensitivity", 
+                     limits = c(1e-6, 1e-4),
+                     expand = expansion(mult = c(0.05, 0.05))) +
+  scale_color_manual(values = colors, name = "speed") +
+  #scale_color_manual(values = c("#2A6B97"), name = "speed") +
+  #coord_fixed(ratio=1) +
   theme_linedraw() +
   theme(axis.title = element_text(size = 12),
         axis.text = element_text(size = 12),
@@ -230,6 +193,9 @@ coef %>%
         axis.line = element_line(color="black"),
         axis.ticks = element_blank())
 ```
+
 ```{r}
-df
+speed_plot <- cowplot::plot_grid(speed_loglog, speed_logx, rel_widths = c(0.33, 0.4))
+speed_plot
+ggsave("figures/speed_plot.png", width = 10, height = 4)
 ```
