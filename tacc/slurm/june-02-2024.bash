@@ -4,7 +4,7 @@
 #SBATCH -N 5                        # number of nodes requested
 #SBATCH -n 600                      # total number of tasks to run in parallel
 #SBATCH -p normal                   # queue (partition) 
-#SBATCH -t 10:00:00                 # run time (hh:mm:ss) 
+#SBATCH -t 5:00:00                  # run time (hh:mm:ss) 
 #SBATCH -A MCB24023                 # Allocation name to charge job against
 
 module load launcher
